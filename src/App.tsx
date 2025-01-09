@@ -17,16 +17,16 @@ function App() {
   const fetchData = async (query: string, start: number) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await fetch(
         `https://demo.dataverse.org/api/search?q=${encodeURIComponent(query || 'data')}&start=${start}`
       );
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch data');
       }
-      
+
       const result: ApiResponse = await response.json();
       setData(result.data.items);
       setTotalItems(result.data.total_count);
@@ -53,19 +53,19 @@ function App() {
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold text-center mb-8">Publications Search</h1>
-        
+
         <SearchForm
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           onSubmit={handleSearch}
         />
-        
+
         {error && (
           <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-6">
             {error}
           </div>
         )}
-        
+
         {loading ? (
           <div className="flex justify-center items-center min-h-[400px]">
             <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
@@ -76,13 +76,22 @@ function App() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       Name
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       Description
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       Date
                     </th>
                   </tr>
@@ -90,8 +99,8 @@ function App() {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {data.map((item) => (
                     <tr key={item.identifier} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <a 
+                      <td className="px-6 py-4 whitespace-normal break-words">
+                        <a
                           href={item.url}
                           target="_blank"
                           rel="noopener noreferrer"
@@ -100,8 +109,8 @@ function App() {
                           {item.name}
                         </a>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-gray-900 line-clamp-2">
+                      <td className="px-6 py-4 whitespace-normal break-words">
+                        <div className="text-sm text-gray-900">
                           {item.description}
                         </div>
                       </td>
@@ -113,7 +122,7 @@ function App() {
                 </tbody>
               </table>
             </div>
-            
+
             {data.length > 0 && (
               <Pagination
                 currentPage={currentPage}
@@ -121,7 +130,7 @@ function App() {
                 onPageChange={setCurrentPage}
               />
             )}
-            
+
             {data.length === 0 && !loading && (
               <div className="text-center text-gray-500">
                 No publications found. Try a different search term.
