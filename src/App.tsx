@@ -13,14 +13,17 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [triggerSearch, setTriggerSearch] = useState(false); // New state to control when to fetch data
 
   const fetchData = async (query: string, start: number) => {
     setLoading(true);
     setError(null);
 
     try {
+      console.log('api called')
       const response = await fetch(
-        `https://demo.dataverse.org/api/search?q=${encodeURIComponent(query || 'data')}&start=${start}`
+        `https://demo.dataverse.org/api/search?q=${encodeURIComponent(query)}&start=${start}`
       );
 
       if (!response.ok) {
@@ -38,13 +41,16 @@ function App() {
   };
 
   useEffect(() => {
-    fetchData(searchQuery, (currentPage - 1) * ITEMS_PER_PAGE);
-  }, [currentPage]);
+    if (hasSearched) {
+      fetchData(searchQuery, (currentPage - 1) * ITEMS_PER_PAGE);
+    }
+  }, [currentPage, triggerSearch]); // Use triggerSearch to avoid duplicate calls
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    setHasSearched(true);
     setCurrentPage(1);
-    fetchData(searchQuery, 0);
+    setTriggerSearch((prev) => !prev); // Toggle triggerSearch to ensure a single API call
   };
 
   const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
@@ -131,9 +137,15 @@ function App() {
               />
             )}
 
-            {data.length === 0 && !loading && (
+            {data.length === 0 && !loading && hasSearched && (
               <div className="text-center text-gray-500">
                 No publications found. Try a different search term.
+              </div>
+            )}
+
+            {!hasSearched && !loading && (
+              <div className="text-center text-gray-500">
+                Search for a publication.
               </div>
             )}
           </>
