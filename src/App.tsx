@@ -3,6 +3,8 @@ import { SearchForm } from './components/SearchForm';
 import { Pagination } from './components/Pagination';
 import { ApiResponse, DataItem } from './types';
 import { Loader2 } from 'lucide-react';
+import { ErrorMessage } from './components/ErrorMessage';
+import { DataTable } from './components/DataTable';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -21,7 +23,7 @@ function App() {
     setError(null);
 
     try {
-      console.log('api called')
+      console.log('API called');
       const response = await fetch(
         `https://demo.dataverse.org/api/search?q=${encodeURIComponent(query)}&start=${start}`
       );
@@ -56,78 +58,29 @@ function App() {
   const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <main className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-8">Publications Search</h1>
+        <header className="text-center mb-8">
+          <h1 className="text-3xl font-bold">Publications Search</h1>
+        </header>
 
-        <SearchForm
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          onSubmit={handleSearch}
-        />
+        <section>
+          <SearchForm
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            onSubmit={handleSearch}
+          />
+        </section>
 
-        {error && (
-          <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-6">
-            {error}
-          </div>
-        )}
+        <ErrorMessage error={error} />
 
         {loading ? (
           <div className="flex justify-center items-center min-h-[400px]">
             <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
           </div>
         ) : (
-          <>
-            <div className="overflow-x-auto bg-white rounded-lg shadow">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      Name
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      Description
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      Date
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {data.map((item) => (
-                    <tr key={item.identifier} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-normal break-words">
-                        <a
-                          href={item.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800"
-                        >
-                          {item.name}
-                        </a>
-                      </td>
-                      <td className="px-6 py-4 whitespace-normal break-words">
-                        <div className="text-sm text-gray-900">
-                          {item.description}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(item.published_at).toLocaleDateString()}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          <section>
+            <DataTable data={data} loading={loading} hasSearched={hasSearched} />
 
             {data.length > 0 && (
               <Pagination
@@ -148,10 +101,10 @@ function App() {
                 Search for a publication.
               </div>
             )}
-          </>
+          </section>
         )}
       </div>
-    </div>
+    </main>
   );
 }
 
